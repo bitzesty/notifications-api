@@ -32,7 +32,11 @@ make generate-version-file
 pip3 install -r requirements_for_test.txt
 
 # Create Postgres databases
-createdb notification_api
+if [[ -z "${NOTIFICATION_API_DB_HOST}" ]] || [[ -z "${NOTIFICATION_API_DB_PORT}" ]] || [[ -z "${NOTIFICATION_API_DB_USER}" ]]; then
+  createdb notification_api
+else
+  createdb -h $NOTIFICATION_API_DB_HOST -p $NOTIFICATION_API_DB_PORT -U $NOTIFICATION_API_DB_USER notification_api
+fi
 
 # Upgrade databases
 source environment.sh
