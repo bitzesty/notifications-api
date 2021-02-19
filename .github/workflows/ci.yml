@@ -1,0 +1,44 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:9.6-alpine
+        ports: ['5432:5432']
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_notification_api
+        options:
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 15s
+          --health-retries 5
+      redis:
+        image: redis
+        ports: ['6379:6379']
+        options:
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.6.12
+    - name: Build and run tests
+      env:
+        NOTIFY_ENVIRONMENT: 'development'
+        FLASK_APP: 'application.py'
+        SQLALCHEMY_DATABASE_URI: "postgresql://postgres:postgres@localhost:5432/test_notification_api"
+      run: |
+        pip3 install -r requirements_for_test.txt
+        make generate-version-file
+        flask db upgrade
+        make test

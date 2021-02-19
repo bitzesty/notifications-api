@@ -788,9 +788,10 @@ def delete_service_letter_contact(service_id, letter_contact_id):
 
     return jsonify(data=archived_letter_contact.serialize()), 200
 
+
 @service_blueprint.route('/<uuid:service_id>/blocklist', methods=['GET'])
 def get_sender_blocklist(service_id):
-    return jsonify({"blocklist":BLACKLISTED_SENDERS})
+    return jsonify({"blocklist": BLACKLISTED_SENDERS})
 
 
 @service_blueprint.route('/<uuid:service_id>/sms-sender', methods=['POST'])
