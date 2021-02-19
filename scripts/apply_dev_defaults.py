@@ -57,6 +57,7 @@ if sender:
 
 # Reset the (randomly generated) password for the default user to a known value
 user = User.query.filter_by(email_address="notify-service-user@digital.cabinet-office.gov.uk").first()
+user.mobile_number = "+447912345678"
 new_password = "hu1aX@UgArA6pZ@*^wQW"
 user.password = new_password
 db.session.commit()
