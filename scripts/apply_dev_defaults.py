@@ -26,7 +26,8 @@ user = User.query.filter_by(email_address="notify-service-user@digital.cabinet-o
 service = Service.query.first()
 
 if user and service:
-    existing_permissions = user.get_permissions()[str(service.id)]
+    permissions_dict = user.get_permissions()
+    existing_permissions = permissions_dict.get(str(service.id), [])
 
     for permission_name in PERMISSION_LIST:
         if permission_name in existing_permissions:
