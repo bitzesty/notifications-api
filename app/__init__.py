@@ -105,7 +105,7 @@ def create_app(application):
     )
     # If a stub url is provided for SES, then use the stub client rather than the real SES boto client
     email_clients = [aws_ses_stub_client] if application.config['SES_STUB_URL'] else [aws_ses_client]
-    notification_provider_clients.init_app(sms_clients=[firetext_client, mmg_client, twilio_client], email_clients=email_clients)
+    notification_provider_clients.init_app(sms_clients=[firetext_client, mmg_client], email_clients=email_clients)
 
     notify_celery.init_app(application)
     encryption.init_app(application)
