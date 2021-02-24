@@ -29,6 +29,7 @@ from app.clients.email.aws_ses import AwsSesClient
 from app.clients.email.aws_ses_stub import AwsSesStubClient
 from app.clients.sms.firetext import FiretextClient
 from app.clients.sms.mmg import MMGClient
+from app.clients.sms.twilio import TwilioClient
 from app.clients.performance_platform.performance_platform_client import PerformancePlatformClient
 
 
@@ -50,6 +51,7 @@ ma = Marshmallow()
 notify_celery = NotifyCelery()
 firetext_client = FiretextClient()
 mmg_client = MMGClient()
+twilio_client = TwilioClient()
 aws_ses_client = AwsSesClient()
 aws_ses_stub_client = AwsSesStubClient()
 encryption = Encryption()
@@ -93,6 +95,7 @@ def create_app(application):
     logging.init_app(application, statsd_client)
     firetext_client.init_app(application, statsd_client=statsd_client)
     mmg_client.init_app(application, statsd_client=statsd_client)
+    twilio_client.init_app(application, statsd_client=statsd_client)
 
     aws_ses_client.init_app(application.config['AWS_REGION'], statsd_client=statsd_client)
     aws_ses_stub_client.init_app(
