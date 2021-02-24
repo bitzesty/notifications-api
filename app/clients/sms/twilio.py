@@ -1,4 +1,5 @@
 import json
+from time import monotonic
 
 from app.clients.sms import (SmsClient, SmsClientResponseException)
 from twilio.rest import Client
@@ -60,13 +61,24 @@ class TwilioClient(SmsClient):
 
     def send_sms(self, to, content, sender=None):
         try:
+            start_time = monotonic()
             client = Client(self.twilio_sid, self.twilio_auth_token)
             message = client.messages.create(
                 to=to,
                 from_=self.from_number if sender is None else sender,
                 body=content
                 )
-            self.record_outcome(client.http_client.last_response)
         except TwilioRestException as exception:
             response = client.http_client.last_response
             raise TwilioClientResponseException(response=response, exception=exception)
+        finally:
+            response = client.http_client.last_response
+            self.record_outcome(response)
+
+            elapsed_time = monotonic() - start_time
+            self.current_app.logger.info("Twilio request finished in {}".format(elapsed_time))
+            self.statsd_client.timing("clients.twilio.request-time", elapsed_time)
+            twilio_request_duration = response.headers.get('Twilio-Request-Duration')
+            self.statsd_client.timing("clients.twilio.raw-request-time", twilio_request_duration)
+
+        return response
