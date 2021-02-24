@@ -100,6 +100,10 @@ class Config(object):
     # Firetext API Key
     FIRETEXT_API_KEY = os.getenv("FIRETEXT_API_KEY")
 
+    # Twilio Credentials
+    TWILIO_SID = os.getenv("TWILIO_SID")
+    TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
+
     # Prefix to identify queues in SQS
     NOTIFICATION_QUEUE_PREFIX = os.getenv('NOTIFICATION_QUEUE_PREFIX')
 
