@@ -1,8 +1,30 @@
 import json
 
-from app.clients.sms import SmsClient
+from app.clients.sms import (SmsClient, SmsClientResponseException)
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
+
+class TwilioUtils:
+
+    @staticmethod
+    def get_error_from_code(error_code):
+        with open('app/clients/sms/twilio_error_codes.json') as f:
+                error_mappings = json.load(f)
+                return error_mappings.get(str(error_code), None)
+
+class TwilioClientResponseException(SmsClientResponseException):
+    def __init__(self, response, exception):
+        response_json = json.loads(response.content)
+        error_code = response_json.get('code', None)
+        error = TwilioUtils.get_error_from_code(error_code)
+
+        self.status_code = response.status_code
+        self.text = error.get('message')
+        self.exception = exception
+
+    def __str__(self):
+        return "Code {} text {} exception {}".format(self.status_code, self.text, str(self.exception))
+
 
 class TwilioClient(SmsClient):
     '''
@@ -27,10 +49,7 @@ class TwilioClient(SmsClient):
         error_code = response_json.get('code', None)
 
         if error_code:
-            with open('app/clients/sms/twilio_error_codes.json') as f:
-                error_mappings = json.load(f)
-                error = error_mappings.get(str(error_code), None)
-
+            error = TwilioUtils.get_error_from_code(error_code)
             self.statsd_client.incr("clients.twilio.error")
             log_message = "Received {} response from Twilio. Error {} ({})".format(status_code, error_code, error.get('message'))
         else:
@@ -38,7 +57,6 @@ class TwilioClient(SmsClient):
             log_message = "Received {} from Twilio API.".format(status_code)
 
         self.current_app.logger.info(log_message)
-
 
     def send_sms(self, to, content, sender=None):
         try:
@@ -50,4 +68,5 @@ class TwilioClient(SmsClient):
                 )
             self.record_outcome(client.http_client.last_response)
         except TwilioRestException as exception:
-            self.record_outcome(client.http_client.last_response)
+            response = client.http_client.last_response
+            raise TwilioClientResponseException(response=response, exception=exception)
