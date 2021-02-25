@@ -5,13 +5,15 @@ from app.clients.sms import (SmsClient, SmsClientResponseException)
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
 
+
 class TwilioUtils:
 
     @staticmethod
     def get_error_from_code(error_code):
         with open('app/clients/sms/twilio_error_codes.json') as f:
-                error_mappings = json.load(f)
-                return error_mappings.get(str(error_code), None)
+            error_mappings = json.load(f)
+            return error_mappings.get(str(error_code), None)
+
 
 class TwilioClientResponseException(SmsClientResponseException):
     def __init__(self, response, exception):
@@ -52,7 +54,9 @@ class TwilioClient(SmsClient):
         if error_code:
             error = TwilioUtils.get_error_from_code(error_code)
             self.statsd_client.incr("clients.twilio.error")
-            log_message = "Received {} response from Twilio. Error {} ({})".format(status_code, error_code, error.get('message'))
+            log_message = "Received {} response from Twilio. Error {} ({})".format(status_code,
+                                                                                   error_code,
+                                                                                   error.get('message'))
         else:
             self.statsd_client.incr("clients.twilio.success")
             log_message = "Received {} from Twilio API.".format(status_code)
@@ -63,7 +67,7 @@ class TwilioClient(SmsClient):
         try:
             start_time = monotonic()
             client = Client(self.twilio_sid, self.twilio_auth_token)
-            message = client.messages.create(
+            client.messages.create(
                 to=to,
                 from_=self.from_number if sender is None else sender,
                 body=content
