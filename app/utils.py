@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timedelta
 
 import pytz
@@ -156,3 +157,11 @@ def get_uuid_string_or_none(val):
 
 def format_sequential_number(sequential_number):
     return format(sequential_number, "x").zfill(8)
+
+
+def get_string_or_default(val, default=None):
+    return val or default
+
+
+def get_env_var(name, default=None):
+    return get_string_or_default(os.environ.get(name), default)
