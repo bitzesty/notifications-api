@@ -1,3 +1,4 @@
+import json
 import random
 from urllib import parse
 from datetime import datetime, timedelta
@@ -32,7 +33,6 @@ from app.models import (
     NOTIFICATION_STATUS_TYPES_COMPLETED
 )
 
-
 def send_sms_to_provider(notification):
     service = notification.service
 
@@ -58,7 +58,7 @@ def send_sms_to_provider(notification):
 
         else:
             try:
-                provider.send_sms(
+                response = provider.send_sms(
                     to=validate_and_format_phone_number(notification.to, international=notification.international),
                     content=str(template),
                     reference=str(notification.id),
@@ -71,6 +71,8 @@ def send_sms_to_provider(notification):
                 raise e
             else:
                 notification.billable_units = template.fragment_count
+                if provider.get_name() == 'twilio':
+                    notification.reference = json.loads(response.content).get('sid')
                 update_notification_to_sending(notification, provider)
 
         delta_seconds = (datetime.utcnow() - notification.created_at).total_seconds()

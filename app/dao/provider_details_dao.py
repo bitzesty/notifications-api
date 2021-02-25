@@ -22,6 +22,8 @@ def get_alternative_sms_provider(identifier):
         return 'mmg'
     elif identifier == 'mmg':
         return 'firetext'
+    elif identifier == 'twilio':
+        return 'firetext'
     raise ValueError('Unrecognised sms provider {}'.format(identifier))
 
 

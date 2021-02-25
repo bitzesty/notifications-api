@@ -1,10 +1,14 @@
 import json
+from urllib.parse import urljoin
 from time import monotonic
 
 from app.clients.sms import (SmsClient, SmsClientResponseException)
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
 
+def get_twilio_responses(status, detailed_status_code=None):
+    # Twilio send meaningful strings in their callbacks so there's no translation required
+    return status, None
 
 class TwilioUtils:
 
@@ -40,6 +44,7 @@ class TwilioClient(SmsClient):
         self.twilio_sid = current_app.config.get('TWILIO_SID')
         self.twilio_auth_token = current_app.config.get('TWILIO_AUTH_TOKEN')
         self.from_number = current_app.config.get('FROM_NUMBER')
+        self.hostname = current_app.config.get('API_HOST_NAME')
         self.name = 'twilio'
         self.statsd_client = statsd_client
 
@@ -63,14 +68,15 @@ class TwilioClient(SmsClient):
 
         self.current_app.logger.info(log_message)
 
-    def send_sms(self, to, content, sender=None):
+    def send_sms(self, to, content, reference=None, sender=None):
         try:
             start_time = monotonic()
             client = Client(self.twilio_sid, self.twilio_auth_token)
             client.messages.create(
                 to=to,
                 from_=self.from_number if sender is None else sender,
-                body=content
+                body=content,
+                status_callback=urljoin(self.hostname, 'notifications/sms/twilio')
                 )
         except TwilioRestException as exception:
             response = client.http_client.last_response

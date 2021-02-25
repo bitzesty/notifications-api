@@ -158,7 +158,6 @@ def update_notification_status_by_id(notification_id, status, sent_by=None, deta
 
 @transactional
 def update_notification_status_by_reference(reference, status):
-    # this is used to update letters and emails
     notification = Notification.query.filter(Notification.reference == reference).first()
 
     if not notification:
@@ -167,7 +166,8 @@ def update_notification_status_by_reference(reference, status):
 
     if notification.status not in {
         NOTIFICATION_SENDING,
-        NOTIFICATION_PENDING
+        NOTIFICATION_PENDING,
+        NOTIFICATION_SENT,
     }:
         _duplicate_update_warning(notification, status)
         return None
