@@ -4,8 +4,9 @@ import json
 
 from celery.schedules import crontab
 from kombu import Exchange, Queue
+from app.utils import get_env_var
 
-if os.environ.get('VCAP_SERVICES'):
+if get_env_var('VCAP_SERVICES'):
     # on cloudfoundry, config is a json blob in VCAP_SERVICES - unpack it, and populate
     # standard environment variables from it
     from app.cloudfoundry_config import extract_cloudfoundry_config
@@ -79,37 +80,37 @@ class TaskNames(object):
 
 class Config(object):
     # URL of admin app
-    ADMIN_BASE_URL = os.getenv('ADMIN_BASE_URL', 'http://localhost:6012')
+    ADMIN_BASE_URL = get_env_var('ADMIN_BASE_URL', 'http://localhost:6012')
 
     # URL of api app (on AWS this is the internal api endpoint)
-    API_HOST_NAME = os.getenv('API_HOST_NAME')
+    API_HOST_NAME = get_env_var('API_HOST_NAME')
 
     # secrets that internal apps, such as the admin app or document download, must use to authenticate with the API
-    API_INTERNAL_SECRETS = json.loads(os.environ.get('API_INTERNAL_SECRETS', '[]'))
+    API_INTERNAL_SECRETS = json.loads(get_env_var('API_INTERNAL_SECRETS', '[]'))
 
     # encyption secret/salt
-    SECRET_KEY = os.getenv('SECRET_KEY')
-    DANGEROUS_SALT = os.getenv('DANGEROUS_SALT')
+    SECRET_KEY = get_env_var('SECRET_KEY')
+    DANGEROUS_SALT = get_env_var('DANGEROUS_SALT')
 
     # DB conection string
-    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
+    SQLALCHEMY_DATABASE_URI = get_env_var('SQLALCHEMY_DATABASE_URI')
 
     # MMG API Key
-    MMG_API_KEY = os.getenv('MMG_API_KEY')
+    MMG_API_KEY = get_env_var('MMG_API_KEY')
 
     # Firetext API Key
-    FIRETEXT_API_KEY = os.getenv("FIRETEXT_API_KEY")
+    FIRETEXT_API_KEY = get_env_var("FIRETEXT_API_KEY")
 
     # Twilio Credentials
     TWILIO_SID = os.getenv("TWILIO_SID")
     TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 
     # Prefix to identify queues in SQS
-    NOTIFICATION_QUEUE_PREFIX = os.getenv('NOTIFICATION_QUEUE_PREFIX')
+    NOTIFICATION_QUEUE_PREFIX = get_env_var('NOTIFICATION_QUEUE_PREFIX')
 
     # URL of redis instance
-    REDIS_URL = os.getenv('REDIS_URL')
-    REDIS_ENABLED = os.getenv('REDIS_ENABLED') == '1'
+    REDIS_URL = get_env_var('REDIS_URL')
+    REDIS_ENABLED = get_env_var('REDIS_ENABLED') == '1'
     EXPIRE_CACHE_TEN_MINUTES = 600
     EXPIRE_CACHE_EIGHT_DAYS = 8 * 24 * 60 * 60
 
@@ -118,15 +119,15 @@ class Config(object):
     PERFORMANCE_PLATFORM_URL = 'https://www.performance.service.gov.uk/data/govuk-notify/'
 
     # Zendesk
-    ZENDESK_API_KEY = os.environ.get('ZENDESK_API_KEY')
+    ZENDESK_API_KEY = get_env_var('ZENDESK_API_KEY')
 
     # Logging
     DEBUG = False
-    NOTIFY_LOG_PATH = os.getenv('NOTIFY_LOG_PATH')
+    NOTIFY_LOG_PATH = get_env_var('NOTIFY_LOG_PATH')
 
     # Cronitor
     CRONITOR_ENABLED = False
-    CRONITOR_KEYS = json.loads(os.environ.get('CRONITOR_KEYS', '{}'))
+    CRONITOR_KEYS = json.loads(get_env_var('CRONITOR_KEYS', '{}'))
 
     # Antivirus
     ANTIVIRUS_ENABLED = True
@@ -142,7 +143,7 @@ class Config(object):
     NOTIFY_APP_NAME = 'api'
     SQLALCHEMY_RECORD_QUERIES = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_POOL_SIZE = int(os.environ.get('SQLALCHEMY_POOL_SIZE', 5))
+    SQLALCHEMY_POOL_SIZE = int(get_env_var('SQLALCHEMY_POOL_SIZE', 5))
     SQLALCHEMY_POOL_TIMEOUT = 30
     SQLALCHEMY_POOL_RECYCLE = 300
     SQLALCHEMY_STATEMENT_TIMEOUT = 1200
@@ -196,10 +197,10 @@ class Config(object):
     CELERY_ACCEPT_CONTENT = ['json']
     CELERY_TASK_SERIALIZER = 'json'
     # on reporting worker, restart workers after each task is executed to help prevent memory leaks
-    CELERYD_MAX_TASKS_PER_CHILD = os.getenv('CELERYD_MAX_TASKS_PER_CHILD')
+    CELERYD_MAX_TASKS_PER_CHILD = get_env_var('CELERYD_MAX_TASKS_PER_CHILD')
     # we can set celeryd_prefetch_multiplier to be 1 for celery apps which handle only long running tasks
-    if os.getenv('CELERYD_PREFETCH_MULTIPLIER'):
-        CELERYD_PREFETCH_MULTIPLIER = os.getenv('CELERYD_PREFETCH_MULTIPLIER')
+    if get_env_var('CELERYD_PREFETCH_MULTIPLIER'):
+        CELERYD_PREFETCH_MULTIPLIER = get_env_var('CELERYD_PREFETCH_MULTIPLIER')
     CELERY_IMPORTS = (
         'app.celery.tasks',
         'app.celery.scheduled_tasks',
@@ -337,7 +338,7 @@ class Config(object):
 
     FROM_NUMBER = 'development'
 
-    STATSD_HOST = os.getenv('STATSD_HOST')
+    STATSD_HOST = get_env_var('STATSD_HOST')
     STATSD_PORT = 8125
     STATSD_ENABLED = bool(STATSD_HOST)
 
@@ -353,36 +354,36 @@ class Config(object):
 
     FREE_SMS_TIER_FRAGMENT_COUNT = 250000
 
-    SMS_INBOUND_WHITELIST = json.loads(os.environ.get('SMS_INBOUND_WHITELIST', '[]'))
-    FIRETEXT_INBOUND_SMS_AUTH = json.loads(os.environ.get('FIRETEXT_INBOUND_SMS_AUTH', '[]'))
-    MMG_INBOUND_SMS_AUTH = json.loads(os.environ.get('MMG_INBOUND_SMS_AUTH', '[]'))
-    MMG_INBOUND_SMS_USERNAME = json.loads(os.environ.get('MMG_INBOUND_SMS_USERNAME', '[]'))
-    ROUTE_SECRET_KEY_1 = os.environ.get('ROUTE_SECRET_KEY_1', '')
-    ROUTE_SECRET_KEY_2 = os.environ.get('ROUTE_SECRET_KEY_2', '')
+    SMS_INBOUND_WHITELIST = json.loads(get_env_var('SMS_INBOUND_WHITELIST', '[]'))
+    FIRETEXT_INBOUND_SMS_AUTH = json.loads(get_env_var('FIRETEXT_INBOUND_SMS_AUTH', '[]'))
+    MMG_INBOUND_SMS_AUTH = json.loads(get_env_var('MMG_INBOUND_SMS_AUTH', '[]'))
+    MMG_INBOUND_SMS_USERNAME = json.loads(get_env_var('MMG_INBOUND_SMS_USERNAME', '[]'))
+    ROUTE_SECRET_KEY_1 = get_env_var('ROUTE_SECRET_KEY_1', '')
+    ROUTE_SECRET_KEY_2 = get_env_var('ROUTE_SECRET_KEY_2', '')
 
-    HIGH_VOLUME_SERVICE = json.loads(os.environ.get('HIGH_VOLUME_SERVICE', '[]'))
+    HIGH_VOLUME_SERVICE = json.loads(get_env_var('HIGH_VOLUME_SERVICE', '[]'))
 
     # Format is as follows:
     # {"dataset_1": "token_1", ...}
-    PERFORMANCE_PLATFORM_ENDPOINTS = json.loads(os.environ.get('PERFORMANCE_PLATFORM_ENDPOINTS', '{}'))
+    PERFORMANCE_PLATFORM_ENDPOINTS = json.loads(get_env_var('PERFORMANCE_PLATFORM_ENDPOINTS', '{}'))
 
-    TEMPLATE_PREVIEW_API_HOST = os.environ.get('TEMPLATE_PREVIEW_API_HOST', 'http://localhost:6013')
-    TEMPLATE_PREVIEW_API_KEY = os.environ.get('TEMPLATE_PREVIEW_API_KEY', 'my-secret-key')
+    TEMPLATE_PREVIEW_API_HOST = get_env_var('TEMPLATE_PREVIEW_API_HOST', 'http://localhost:6013')
+    TEMPLATE_PREVIEW_API_KEY = get_env_var('TEMPLATE_PREVIEW_API_KEY', 'my-secret-key')
 
-    DOCUMENT_DOWNLOAD_API_HOST = os.environ.get('DOCUMENT_DOWNLOAD_API_HOST', 'http://localhost:7000')
-    DOCUMENT_DOWNLOAD_API_KEY = os.environ.get('DOCUMENT_DOWNLOAD_API_KEY', 'auth-token')
+    DOCUMENT_DOWNLOAD_API_HOST = get_env_var('DOCUMENT_DOWNLOAD_API_HOST', 'http://localhost:7000')
+    DOCUMENT_DOWNLOAD_API_KEY = get_env_var('DOCUMENT_DOWNLOAD_API_KEY', 'auth-token')
 
     # these environment vars aren't defined in the manifest so to set them on paas use `cf set-env`
-    MMG_URL = os.environ.get("MMG_URL", "https://api.mmg.co.uk/jsonv2a/api.php")
-    FIRETEXT_URL = os.environ.get("FIRETEXT_URL", "https://www.firetext.co.uk/api/sendsms/json")
-    SES_STUB_URL = os.environ.get("SES_STUB_URL")
+    MMG_URL = get_env_var("MMG_URL", "https://api.mmg.co.uk/jsonv2a/api.php")
+    FIRETEXT_URL = get_env_var("FIRETEXT_URL", "https://www.firetext.co.uk/api/sendsms/json")
+    SES_STUB_URL = get_env_var("SES_STUB_URL")
 
-    AWS_REGION = os.getenv('AWS_REGION', 'eu-west-1')
+    AWS_REGION = get_env_var('AWS_REGION', 'eu-west-1')
 
     # CBC Proxy
     # if the access keys are empty then noop client is used
-    CBC_PROXY_AWS_ACCESS_KEY_ID = os.environ.get('CBC_PROXY_AWS_ACCESS_KEY_ID', '')
-    CBC_PROXY_AWS_SECRET_ACCESS_KEY = os.environ.get('CBC_PROXY_AWS_SECRET_ACCESS_KEY', '')
+    CBC_PROXY_AWS_ACCESS_KEY_ID = get_env_var('CBC_PROXY_AWS_ACCESS_KEY_ID', '')
+    CBC_PROXY_AWS_SECRET_ACCESS_KEY = get_env_var('CBC_PROXY_AWS_SECRET_ACCESS_KEY', '')
 
     CBC_PROXY_ENABLED = bool(CBC_PROXY_AWS_ACCESS_KEY_ID)
 
@@ -397,15 +398,15 @@ class Development(Config):
     DEBUG = True
     SQLALCHEMY_ECHO = False
 
-    CSV_UPLOAD_BUCKET_NAME = os.getenv('CSV_UPLOAD_BUCKET_NAME', 'development-notifications-csv-upload')
-    CONTACT_LIST_BUCKET_NAME = os.getenv('CONTACT_LIST_BUCKET_NAME', 'development-contact-list')
-    TEST_LETTERS_BUCKET_NAME = os.getenv('TEST_LETTERS_BUCKET_NAME', 'development-test-letters')
-    DVLA_RESPONSE_BUCKET_NAME = os.getenv('DVLA_RESPONSE_BUCKET_NAME', 'notify.tools-ftp')
-    LETTERS_PDF_BUCKET_NAME = os.getenv('LETTERS_PDF_BUCKET_NAME', 'development-letters-pdf')
-    LETTERS_SCAN_BUCKET_NAME = os.getenv('LETTERS_SCAN_BUCKET_NAME', 'development-letters-scan')
-    INVALID_PDF_BUCKET_NAME = os.getenv('INVALID_PDF_BUCKET_NAME', 'development-letters-invalid-pdf')
-    TRANSIENT_UPLOADED_LETTERS = os.getenv('TRANSIENT_UPLOADED_LETTERS', 'development-transient-uploaded-letters')
-    LETTER_SANITISE_BUCKET_NAME = os.getenv('LETTER_SANITISE_BUCKET_NAME', 'development-letters-sanitise')
+    CSV_UPLOAD_BUCKET_NAME = get_env_var('CSV_UPLOAD_BUCKET_NAME', 'development-notifications-csv-upload')
+    CONTACT_LIST_BUCKET_NAME = get_env_var('CONTACT_LIST_BUCKET_NAME', 'development-contact-list')
+    TEST_LETTERS_BUCKET_NAME = get_env_var('TEST_LETTERS_BUCKET_NAME', 'development-test-letters')
+    DVLA_RESPONSE_BUCKET_NAME = get_env_var('DVLA_RESPONSE_BUCKET_NAME', 'notify.tools-ftp')
+    LETTERS_PDF_BUCKET_NAME = get_env_var('LETTERS_PDF_BUCKET_NAME', 'development-letters-pdf')
+    LETTERS_SCAN_BUCKET_NAME = get_env_var('LETTERS_SCAN_BUCKET_NAME', 'development-letters-scan')
+    INVALID_PDF_BUCKET_NAME = get_env_var('INVALID_PDF_BUCKET_NAME', 'development-letters-invalid-pdf')
+    TRANSIENT_UPLOADED_LETTERS = get_env_var('TRANSIENT_UPLOADED_LETTERS', 'development-transient-uploaded-letters')
+    LETTER_SANITISE_BUCKET_NAME = get_env_var('LETTER_SANITISE_BUCKET_NAME', 'development-letters-sanitise')
 
     API_INTERNAL_SECRETS = ['dev-notify-secret-key']
     SECRET_KEY = 'dev-notify-secret-key'
@@ -419,10 +420,10 @@ class Development(Config):
     NOTIFICATION_QUEUE_PREFIX = 'development'
     NOTIFY_EMAIL_DOMAIN = "notify.tools"
 
-    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', 'postgresql://localhost/notification_api')
-    REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+    SQLALCHEMY_DATABASE_URI = get_env_var('SQLALCHEMY_DATABASE_URI', 'postgresql://localhost/notification_api')
+    REDIS_URL = get_env_var('REDIS_URL', 'redis://localhost:6379/0')
 
-    ANTIVIRUS_ENABLED = os.getenv('ANTIVIRUS_ENABLED') == '1'
+    ANTIVIRUS_ENABLED = get_env_var('ANTIVIRUS_ENABLED') == '1'
 
     for queue in QueueNames.all_queues():
         Config.CELERY_QUEUES.append(
@@ -457,7 +458,7 @@ class Test(Development):
     LETTER_SANITISE_BUCKET_NAME = 'test-letters-sanitise'
 
     # this is overriden in jenkins and on cloudfoundry
-    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', 'postgresql://localhost/test_notification_api')
+    SQLALCHEMY_DATABASE_URI = get_env_var('SQLALCHEMY_DATABASE_URI', 'postgresql://localhost/test_notification_api')
 
     BROKER_URL = 'you-forgot-to-mock-celery-in-your-tests://'
 
@@ -482,58 +483,58 @@ class Test(Development):
 
 
 class Preview(Config):
-    NOTIFY_EMAIL_DOMAIN = os.getenv('NOTIFY_EMAIL_DOMAIN', 'notify.works')
-    NOTIFY_ENVIRONMENT = os.getenv('NOTIFY_ENVIRONMENT', 'preview')
-    CSV_UPLOAD_BUCKET_NAME = os.getenv('CSV_UPLOAD_BUCKET_NAME', 'preview-notifications-csv-upload')
-    CONTACT_LIST_BUCKET_NAME = os.getenv('CONTACT_LIST_BUCKET_NAME', 'preview-contact-list')
-    TEST_LETTERS_BUCKET_NAME = os.getenv('TEST_LETTERS_BUCKET_NAME', 'preview-test-letters')
-    DVLA_RESPONSE_BUCKET_NAME = os.getenv('DVLA_RESPONSE_BUCKET_NAME', 'notify.works-ftp')
-    LETTERS_PDF_BUCKET_NAME = os.getenv('LETTERS_PDF_BUCKET_NAME', 'preview-letters-pdf')
-    LETTERS_SCAN_BUCKET_NAME = os.getenv('LETTERS_SCAN_BUCKET_NAME', 'preview-letters-scan')
-    INVALID_PDF_BUCKET_NAME = os.getenv('INVALID_PDF_BUCKET_NAME', 'preview-letters-invalid-pdf')
-    TRANSIENT_UPLOADED_LETTERS = os.getenv('TRANSIENT_UPLOADED_LETTERS', 'preview-transient-uploaded-letters')
-    LETTER_SANITISE_BUCKET_NAME = os.getenv('LETTER_SANITISE_BUCKET_NAME', 'preview-letters-sanitise')
-    FROM_NUMBER = os.getenv('FROM_NUMBER', 'preview')
-    API_RATE_LIMIT_ENABLED = os.getenv("API_RATE_LIMIT_ENABLED", 'True').lower() in ['true', '1']
-    CHECK_PROXY_HEADER = os.getenv("CHECK_PROXY_HEADER", 'False').lower() in ['true', '1']
+    NOTIFY_EMAIL_DOMAIN = get_env_var('NOTIFY_EMAIL_DOMAIN', 'notify.works')
+    NOTIFY_ENVIRONMENT = get_env_var('NOTIFY_ENVIRONMENT', 'preview')
+    CSV_UPLOAD_BUCKET_NAME = get_env_var('CSV_UPLOAD_BUCKET_NAME', 'preview-notifications-csv-upload')
+    CONTACT_LIST_BUCKET_NAME = get_env_var('CONTACT_LIST_BUCKET_NAME', 'preview-contact-list')
+    TEST_LETTERS_BUCKET_NAME = get_env_var('TEST_LETTERS_BUCKET_NAME', 'preview-test-letters')
+    DVLA_RESPONSE_BUCKET_NAME = get_env_var('DVLA_RESPONSE_BUCKET_NAME', 'notify.works-ftp')
+    LETTERS_PDF_BUCKET_NAME = get_env_var('LETTERS_PDF_BUCKET_NAME', 'preview-letters-pdf')
+    LETTERS_SCAN_BUCKET_NAME = get_env_var('LETTERS_SCAN_BUCKET_NAME', 'preview-letters-scan')
+    INVALID_PDF_BUCKET_NAME = get_env_var('INVALID_PDF_BUCKET_NAME', 'preview-letters-invalid-pdf')
+    TRANSIENT_UPLOADED_LETTERS = get_env_var('TRANSIENT_UPLOADED_LETTERS', 'preview-transient-uploaded-letters')
+    LETTER_SANITISE_BUCKET_NAME = get_env_var('LETTER_SANITISE_BUCKET_NAME', 'preview-letters-sanitise')
+    FROM_NUMBER = get_env_var('FROM_NUMBER', 'preview')
+    API_RATE_LIMIT_ENABLED = get_env_var("API_RATE_LIMIT_ENABLED", 'True').lower() in ['true', '1']
+    CHECK_PROXY_HEADER = get_env_var("CHECK_PROXY_HEADER", 'False').lower() in ['true', '1']
 
 
 class Staging(Config):
-    NOTIFY_EMAIL_DOMAIN = os.getenv('NOTIFY_EMAIL_DOMAIN', 'staging-notify.works')
-    NOTIFY_ENVIRONMENT = os.getenv('NOTIFY_ENVIRONMENT', 'staging')
-    CSV_UPLOAD_BUCKET_NAME = os.getenv('CSV_UPLOAD_BUCKET_NAME', 'staging-notifications-csv-upload')
-    CONTACT_LIST_BUCKET_NAME = os.getenv('CONTACT_LIST_BUCKET_NAME', 'staging-contact-list')
-    TEST_LETTERS_BUCKET_NAME = os.getenv('TEST_LETTERS_BUCKET_NAME', 'staging-test-letters')
-    DVLA_RESPONSE_BUCKET_NAME = os.getenv('DVLA_RESPONSE_BUCKET_NAME', 'staging-notify.works-ftp')
-    LETTERS_PDF_BUCKET_NAME = os.getenv('LETTERS_PDF_BUCKET_NAME', 'staging-letters-pdf')
-    LETTERS_SCAN_BUCKET_NAME = os.getenv('LETTERS_SCAN_BUCKET_NAME', 'staging-letters-scan')
-    INVALID_PDF_BUCKET_NAME = os.getenv('INVALID_PDF_BUCKET_NAME', 'staging-letters-invalid-pdf')
-    TRANSIENT_UPLOADED_LETTERS = os.getenv('TRANSIENT_UPLOADED_LETTERS', 'staging-transient-uploaded-letters')
-    LETTER_SANITISE_BUCKET_NAME = os.getenv('LETTER_SANITISE_BUCKET_NAME', 'staging-letters-sanitise')
-    FROM_NUMBER = os.getenv('FROM_NUMBER', 'stage')
-    API_RATE_LIMIT_ENABLED = os.getenv("API_RATE_LIMIT_ENABLED", 'True').lower() in ['true', '1']
-    CHECK_PROXY_HEADER = os.getenv("CHECK_PROXY_HEADER", 'False').lower() in ['true', '1']
+    NOTIFY_EMAIL_DOMAIN = get_env_var('NOTIFY_EMAIL_DOMAIN', 'staging-notify.works')
+    NOTIFY_ENVIRONMENT = get_env_var('NOTIFY_ENVIRONMENT', 'staging')
+    CSV_UPLOAD_BUCKET_NAME = get_env_var('CSV_UPLOAD_BUCKET_NAME', 'staging-notifications-csv-upload')
+    CONTACT_LIST_BUCKET_NAME = get_env_var('CONTACT_LIST_BUCKET_NAME', 'staging-contact-list')
+    TEST_LETTERS_BUCKET_NAME = get_env_var('TEST_LETTERS_BUCKET_NAME', 'staging-test-letters')
+    DVLA_RESPONSE_BUCKET_NAME = get_env_var('DVLA_RESPONSE_BUCKET_NAME', 'staging-notify.works-ftp')
+    LETTERS_PDF_BUCKET_NAME = get_env_var('LETTERS_PDF_BUCKET_NAME', 'staging-letters-pdf')
+    LETTERS_SCAN_BUCKET_NAME = get_env_var('LETTERS_SCAN_BUCKET_NAME', 'staging-letters-scan')
+    INVALID_PDF_BUCKET_NAME = get_env_var('INVALID_PDF_BUCKET_NAME', 'staging-letters-invalid-pdf')
+    TRANSIENT_UPLOADED_LETTERS = get_env_var('TRANSIENT_UPLOADED_LETTERS', 'staging-transient-uploaded-letters')
+    LETTER_SANITISE_BUCKET_NAME = get_env_var('LETTER_SANITISE_BUCKET_NAME', 'staging-letters-sanitise')
+    FROM_NUMBER = get_env_var('FROM_NUMBER', 'stage')
+    API_RATE_LIMIT_ENABLED = get_env_var("API_RATE_LIMIT_ENABLED", 'True').lower() in ['true', '1']
+    CHECK_PROXY_HEADER = get_env_var("CHECK_PROXY_HEADER", 'False').lower() in ['true', '1']
 
 
 class Live(Config):
-    NOTIFY_EMAIL_DOMAIN = os.getenv('NOTIFY_EMAIL_DOMAIN', 'notifications.service.gov.uk')
-    NOTIFY_ENVIRONMENT = os.getenv('NOTIFY_ENVIRONMENT', 'live')
-    CSV_UPLOAD_BUCKET_NAME = os.getenv('CSV_UPLOAD_BUCKET_NAME', 'live-notifications-csv-upload')
-    CONTACT_LIST_BUCKET_NAME = os.getenv('CONTACT_LIST_BUCKET_NAME', 'production-contact-list')
-    TEST_LETTERS_BUCKET_NAME = os.getenv('TEST_LETTERS_BUCKET_NAME', 'production-test-letters')
-    DVLA_RESPONSE_BUCKET_NAME = os.getenv('DVLA_RESPONSE_BUCKET_NAME', 'notifications.service.gov.uk-ftp')
-    LETTERS_PDF_BUCKET_NAME = os.getenv('LETTERS_PDF_BUCKET_NAME', 'production-letters-pdf')
-    LETTERS_SCAN_BUCKET_NAME = os.getenv('LETTERS_SCAN_BUCKET_NAME', 'production-letters-scan')
-    INVALID_PDF_BUCKET_NAME = os.getenv('INVALID_PDF_BUCKET_NAME', 'production-letters-invalid-pdf')
-    TRANSIENT_UPLOADED_LETTERS = os.getenv('TRANSIENT_UPLOADED_LETTERS', 'production-transient-uploaded-letters')
-    LETTER_SANITISE_BUCKET_NAME = os.getenv('LETTER_SANITISE_BUCKET_NAME', 'production-letters-sanitise')
-    FROM_NUMBER = os.getenv('FROM_NUMBER', 'GOVUK')
-    PERFORMANCE_PLATFORM_ENABLED = os.getenv("PERFORMANCE_PLATFORM_ENABLED", 'True').lower() in ['true', '1']
-    API_RATE_LIMIT_ENABLED = os.getenv("API_RATE_LIMIT_ENABLED", 'True').lower() in ['true', '1']
-    CHECK_PROXY_HEADER = os.getenv("CHECK_PROXY_HEADER", 'False').lower() in ['true', '1']
+    NOTIFY_EMAIL_DOMAIN = get_env_var('NOTIFY_EMAIL_DOMAIN', 'notifications.service.gov.uk')
+    NOTIFY_ENVIRONMENT = get_env_var('NOTIFY_ENVIRONMENT', 'live')
+    CSV_UPLOAD_BUCKET_NAME = get_env_var('CSV_UPLOAD_BUCKET_NAME', 'live-notifications-csv-upload')
+    CONTACT_LIST_BUCKET_NAME = get_env_var('CONTACT_LIST_BUCKET_NAME', 'production-contact-list')
+    TEST_LETTERS_BUCKET_NAME = get_env_var('TEST_LETTERS_BUCKET_NAME', 'production-test-letters')
+    DVLA_RESPONSE_BUCKET_NAME = get_env_var('DVLA_RESPONSE_BUCKET_NAME', 'notifications.service.gov.uk-ftp')
+    LETTERS_PDF_BUCKET_NAME = get_env_var('LETTERS_PDF_BUCKET_NAME', 'production-letters-pdf')
+    LETTERS_SCAN_BUCKET_NAME = get_env_var('LETTERS_SCAN_BUCKET_NAME', 'production-letters-scan')
+    INVALID_PDF_BUCKET_NAME = get_env_var('INVALID_PDF_BUCKET_NAME', 'production-letters-invalid-pdf')
+    TRANSIENT_UPLOADED_LETTERS = get_env_var('TRANSIENT_UPLOADED_LETTERS', 'production-transient-uploaded-letters')
+    LETTER_SANITISE_BUCKET_NAME = get_env_var('LETTER_SANITISE_BUCKET_NAME', 'production-letters-sanitise')
+    FROM_NUMBER = get_env_var('FROM_NUMBER', 'GOVUK')
+    PERFORMANCE_PLATFORM_ENABLED = get_env_var("PERFORMANCE_PLATFORM_ENABLED", 'True').lower() in ['true', '1']
+    API_RATE_LIMIT_ENABLED = get_env_var("API_RATE_LIMIT_ENABLED", 'True').lower() in ['true', '1']
+    CHECK_PROXY_HEADER = get_env_var("CHECK_PROXY_HEADER", 'False').lower() in ['true', '1']
     SES_STUB_URL = None
 
-    CRONITOR_ENABLED = os.getenv("CRONITOR_ENABLED", 'True').lower() in ['true', '1']
+    CRONITOR_ENABLED = get_env_var("CRONITOR_ENABLED", 'True').lower() in ['true', '1']
 
     ENABLED_CBCS = {BroadcastProvider.VODAFONE}
 
@@ -544,17 +545,17 @@ class CloudFoundryConfig(Config):
 
 # CloudFoundry sandbox
 class Sandbox(CloudFoundryConfig):
-    NOTIFY_EMAIL_DOMAIN = os.getenv('NOTIFY_EMAIL_DOMAIN', 'notify.works')
-    NOTIFY_ENVIRONMENT = os.getenv('NOTIFY_ENVIRONMENT', 'sandbox')
-    CSV_UPLOAD_BUCKET_NAME = os.getenv('CSV_UPLOAD_BUCKET_NAME', 'cf-sandbox-notifications-csv-upload')
-    CONTACT_LIST_BUCKET_NAME = os.getenv('CONTACT_LIST_BUCKET_NAME', 'cf-sandbox-contact-list')
-    LETTERS_PDF_BUCKET_NAME = os.getenv('LETTERS_PDF_BUCKET_NAME', 'cf-sandbox-letters-pdf')
-    TEST_LETTERS_BUCKET_NAME = os.getenv('TEST_LETTERS_BUCKET_NAME', 'cf-sandbox-test-letters')
-    DVLA_RESPONSE_BUCKET_NAME = os.getenv('DVLA_RESPONSE_BUCKET_NAME', 'notify.works-ftp')
-    LETTERS_PDF_BUCKET_NAME = os.getenv('LETTERS_PDF_BUCKET_NAME', 'cf-sandbox-letters-pdf')
-    LETTERS_SCAN_BUCKET_NAME = os.getenv('LETTERS_SCAN_BUCKET_NAME', 'cf-sandbox-letters-scan')
-    INVALID_PDF_BUCKET_NAME = os.getenv('INVALID_PDF_BUCKET_NAME', 'cf-sandbox-letters-invalid-pdf')
-    FROM_NUMBER = os.getenv('FROM_NUMBER', 'sandbox')
+    NOTIFY_EMAIL_DOMAIN = get_env_var('NOTIFY_EMAIL_DOMAIN', 'notify.works')
+    NOTIFY_ENVIRONMENT = get_env_var('NOTIFY_ENVIRONMENT', 'sandbox')
+    CSV_UPLOAD_BUCKET_NAME = get_env_var('CSV_UPLOAD_BUCKET_NAME', 'cf-sandbox-notifications-csv-upload')
+    CONTACT_LIST_BUCKET_NAME = get_env_var('CONTACT_LIST_BUCKET_NAME', 'cf-sandbox-contact-list')
+    LETTERS_PDF_BUCKET_NAME = get_env_var('LETTERS_PDF_BUCKET_NAME', 'cf-sandbox-letters-pdf')
+    TEST_LETTERS_BUCKET_NAME = get_env_var('TEST_LETTERS_BUCKET_NAME', 'cf-sandbox-test-letters')
+    DVLA_RESPONSE_BUCKET_NAME = get_env_var('DVLA_RESPONSE_BUCKET_NAME', 'notify.works-ftp')
+    LETTERS_PDF_BUCKET_NAME = get_env_var('LETTERS_PDF_BUCKET_NAME', 'cf-sandbox-letters-pdf')
+    LETTERS_SCAN_BUCKET_NAME = get_env_var('LETTERS_SCAN_BUCKET_NAME', 'cf-sandbox-letters-scan')
+    INVALID_PDF_BUCKET_NAME = get_env_var('INVALID_PDF_BUCKET_NAME', 'cf-sandbox-letters-invalid-pdf')
+    FROM_NUMBER = get_env_var('FROM_NUMBER', 'sandbox')
 
 
 configs = {
