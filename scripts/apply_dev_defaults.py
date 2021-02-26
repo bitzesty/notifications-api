@@ -65,6 +65,7 @@ print("\n\nYou can now login the notifactions-admin app using the following cred
 print("Email: {}\nPassword: {}".format(user.email_address, new_password))
 
 # Add ProviderDetails records for Twilio
-twilio_provider = ProviderDetails(display_name="Twilio", supports_international=True, version=1, notification_type='sms', identifier='twilio', priority=20, active=True)
+twilio_provider = ProviderDetails(display_name="Twilio", supports_international=True, version=1,
+                                  notification_type='sms', identifier='twilio', priority=20, active=True)
 db.session.add(twilio_provider)
 db.session.commit()

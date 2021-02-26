@@ -25,6 +25,7 @@ def process_twilio_response():
 
     return jsonify(result='success'), 200
 
+
 @sms_callback_blueprint.route('/mmg', methods=['POST'])
 def process_mmg_response():
     client_name = 'MMG'

@@ -6,9 +6,11 @@ from app.clients.sms import (SmsClient, SmsClientResponseException)
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
 
+
 def get_twilio_responses(status, detailed_status_code=None):
     # Twilio send meaningful strings in their callbacks so there's no translation required
     return status, None
+
 
 class TwilioUtils:
 
@@ -18,9 +20,10 @@ class TwilioUtils:
             error_mappings = json.load(f)
             return error_mappings.get(str(error_code), None)
 
-
+    @staticmethod
     def format_number_for_twilio(number):
         return '+' + number
+
 
 class TwilioClientResponseException(SmsClientResponseException):
     def __init__(self, response, exception):

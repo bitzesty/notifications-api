@@ -33,6 +33,7 @@ from app.models import (
     NOTIFICATION_STATUS_TYPES_COMPLETED
 )
 
+
 def send_sms_to_provider(notification):
     service = notification.service
 
