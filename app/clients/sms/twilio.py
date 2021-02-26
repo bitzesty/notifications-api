@@ -19,6 +19,9 @@ class TwilioUtils:
             return error_mappings.get(str(error_code), None)
 
 
+    def format_number_for_twilio(number):
+        return '+' + number
+
 class TwilioClientResponseException(SmsClientResponseException):
     def __init__(self, response, exception):
         response_json = json.loads(response.content)
@@ -73,11 +76,11 @@ class TwilioClient(SmsClient):
             start_time = monotonic()
             client = Client(self.twilio_sid, self.twilio_auth_token)
             client.messages.create(
-                to=to,
+                to=TwilioUtils.format_number_for_twilio(to),
                 from_=self.from_number if sender is None else sender,
                 body=content,
                 status_callback=urljoin(self.hostname, 'notifications/sms/twilio')
-                )
+            )
         except TwilioRestException as exception:
             response = client.http_client.last_response
             raise TwilioClientResponseException(response=response, exception=exception)
