@@ -11,6 +11,21 @@ sms_callback_blueprint = Blueprint("sms_callback", __name__, url_prefix="/notifi
 register_errors(sms_callback_blueprint)
 
 
+@sms_callback_blueprint.route('/twilio', methods=['POST'])
+def process_twilio_response():
+    client_name = 'Twilio'
+    data = request.form
+    status = data.get('MessageStatus')
+    provider_reference = data.get('MessageSid')
+
+    process_sms_client_response.apply_async(
+        [status, provider_reference, client_name],
+        queue=QueueNames.SMS_CALLBACKS,
+    )
+
+    return jsonify(result='success'), 200
+
+
 @sms_callback_blueprint.route('/mmg', methods=['POST'])
 def process_mmg_response():
     client_name = 'MMG'
