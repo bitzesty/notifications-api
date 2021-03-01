@@ -1,0 +1,19 @@
+environment:
+  - API_NOTIFY_ENVIRONMENT
+  - API_HOST_NAME
+  - ADMIN_BASE_URL
+resources:
+  db:
+    type: postgres
+    options:
+      version: 9
+  redis:
+    type: redis
+services:
+  api:
+    image: bitzesty/notifications-api:latest
+    command: 'flask run --host=0.0.0.0 -p 6011'
+    port: 6011
+    resorces:
+      - db:SQLALCHEMY_DATABASE_URI
+      - redis
