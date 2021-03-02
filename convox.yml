@@ -2,6 +2,7 @@ environment:
   - API_HOST_NAME=api.notifications-api.dev.convox
   - ADMIN_BASE_URL=web.notifications-admin.dev.convox
   - NOTIFY_ENVIRONMENT=development
+  - PYTHONUNBUFFERED=TRUE
 resources:
   db:
     type: postgres
@@ -11,8 +12,10 @@ resources:
     type: redis
 services:
   api:
-    image: bitzesty/notifications-api:latest
-    command: 'flask run --host=0.0.0.0 -p 6011'
+    build:
+      path: .
+      manifest: docker/Dockerfile.convox
+    command: 'gunicorn -c gunicorn_config.py application'
     domain: ${DOMAIN}
     port: 6011
     resources:
