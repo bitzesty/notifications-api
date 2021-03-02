@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Bootstrap virtualenv environment and postgres databases locally.
+# Responsible for running one-time task(s) required to setup the application locally.
 #
 # NOTE: This script expects to be run from the project root with
 # ./scripts/bootstrap.sh
@@ -23,18 +23,4 @@ export SQLALCHEMY_DATABASE_URI='postgresql://db:password@localhost:5432/notifica
 "> environment.sh
 fi
 
-
-if [ ! $VIRTUAL_ENV ]; then
-  virtualenv -p python3 ./venv
-  . ./venv/bin/activate
-fi
-
-# we need the version file to exist otherwise the app will blow up
-make generate-version-file
-
-# Install Python development dependencies
-pip3 install -r requirements_for_test.txt
-
-# Upgrade databases
-source environment.sh
-flask db upgrade
+./update_dependencies_and_migrate_db.sh
