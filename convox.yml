@@ -4,5 +4,4 @@ services:
       path: .
       manifest: docker/Dockerfile.convox
     command: 'gunicorn -c gunicorn_config.py application'
-    domain: ${DOMAIN}
-    port: 6011
+    port: 8080

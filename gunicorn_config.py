@@ -8,7 +8,7 @@ from gds_metrics.gunicorn import child_exit  # noqa
 workers = 4
 worker_class = "eventlet"
 worker_connections = 256
-bind = "0.0.0.0:{}".format(os.getenv("PORT"))
+bind = "0.0.0.0:8080"
 statsd_host = "{}:8125".format(os.getenv("STATSD_HOST"))
 gunicorn.SERVER_SOFTWARE = 'None'
 
