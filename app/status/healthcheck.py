@@ -1,7 +1,6 @@
 from flask import (
     jsonify,
-    Blueprint,
-    request
+    Blueprint
 )
 
 from app.dao.services_dao import dao_count_live_services
