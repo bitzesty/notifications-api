@@ -23,4 +23,8 @@ export SQLALCHEMY_DATABASE_URI='postgresql://db:password@localhost:5432/notifica
 "> environment.sh
 fi
 
-./update_dependencies_and_migrate_db.sh
+# Install Python dependencies and run any pending migrations
+scripts/update_dependencies_and_migrate_db.sh
+
+# Update seeded DB records with sensible default for local development
+source environment.sh && python scripts/update_database_records_for_local_development.py
