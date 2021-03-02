@@ -1,15 +1,5 @@
 environment:
-  - API_HOST_NAME=api.notifications-api.dev.convox
-  - ADMIN_BASE_URL=web.notifications-admin.dev.convox
-  - NOTIFY_ENVIRONMENT=development
-  - PORT=6011
-resources:
-  db:
-    type: postgres
-    options:
-      version: 9
-  redis:
-    type: redis
+  - *
 services:
   api:
     build:
@@ -18,6 +8,3 @@ services:
     command: 'gunicorn -c gunicorn_config.py application'
     domain: ${DOMAIN}
     port: 6011
-    resources:
-      - db:SQLALCHEMY_DATABASE_URI
-      - redis
