@@ -1,7 +1,7 @@
 environment:
-  - API_NOTIFY_ENVIRONMENT
-  - API_HOST_NAME
-  - ADMIN_BASE_URL
+  - API_HOST_NAME=api.notifications-api.dev.convox
+  - ADMIN_BASE_URL=web.notifications-admin.dev.convox
+  - NOTIFY_ENVIRONMENT=development
 resources:
   db:
     type: postgres
