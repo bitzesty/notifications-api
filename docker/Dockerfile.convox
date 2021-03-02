@@ -21,11 +21,6 @@ RUN \
 	&& echo "Clean up" \
 	&& rm -rf /var/lib/apt/lists/* /tmp/*
 
-RUN \
-	echo "Install Cloud Foundry CLI" \
-	&& curl -sSL "https://cli.run.pivotal.io/stable?release=debian64&source=github" -o /tmp/cloudfoundry-cli.deb \
-	&& dpkg -i /tmp/cloudfoundry-cli.deb
-
 # these are declared statically here so that they're cached by the docker image - if we run after the `COPY` command
 # they won't be cached so it'll re-download every time. But these don't involve the filesystem
 COPY ./requirements.txt .
@@ -37,7 +32,3 @@ RUN \
 WORKDIR /var/project
 
 COPY . .
-
-EXPOSE 6011
-
-CMD ["flask", "run", "--host=0.0.0.0", "-p", "6011"]

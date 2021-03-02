@@ -2,7 +2,7 @@ environment:
   - API_HOST_NAME=api.notifications-api.dev.convox
   - ADMIN_BASE_URL=web.notifications-admin.dev.convox
   - NOTIFY_ENVIRONMENT=development
-  - PYTHONUNBUFFERED=TRUE
+  - PORT=6011
 resources:
   db:
     type: postgres
