@@ -1,7 +1,14 @@
 environment:
-  - API_HOST_NAME=api.notifications-api.dev.convox
-  - ADMIN_BASE_URL=web.notifications-admin.dev.convox
-  - NOTIFY_ENVIRONMENT=development
+  - ADMIN_BASE_URL
+  - API_HOST_NAME
+  - NOTIFY_ENVIRONMENT
+  - DOMAIN
+  - AWS_DEFAULT_REGION
+  - AWS_REGION
+  - AWS_ACCESS_KEY_ID
+  - AWS_SECRET_ACCESS_KEY
+  - SQLALCHEMY_DATABASE_URI
+  - SENTRY_DSN
 services:
   api:
     build:
