@@ -1,43 +1,30 @@
 #!/bin/bash
 #
-# Bootstrap virtualenv environment and postgres databases locally.
+# Responsible for running one-time task(s) required to setup the application locally.
 #
 # NOTE: This script expects to be run from the project root with
 # ./scripts/bootstrap.sh
 
 set -o pipefail
 
-function display_result {
-  RESULT=$1
-  EXIT_STATUS=$2
-  TEST=$3
+if [ ! -f 'environment.sh' ]; then
+echo "
+export NOTIFY_ENVIRONMENT='development'
 
-  if [ $RESULT -ne 0 ]; then
-    echo -e "\033[31m$TEST failed\033[0m"
-    exit $EXIT_STATUS
-  else
-    echo -e "\033[32m$TEST passed\033[0m"
-  fi
-}
+export MMG_API_KEY='MMG_API_KEY'
+export FIRETEXT_API_KEY='FIRETEXT_ACTUAL_KEY'
+export NOTIFICATION_QUEUE_PREFIX='YOUR_OWN_PREFIX'
 
-if [ ! $VIRTUAL_ENV ]; then
-  virtualenv -p python3 ./venv
-  . ./venv/bin/activate
+export FLASK_APP=application.py
+export FLASK_ENV=development
+export WERKZEUG_DEBUG_PIN=off
+
+export SQLALCHEMY_DATABASE_URI='postgresql://db:password@localhost:5432/notification_api'
+"> environment.sh
 fi
 
-# we need the version file to exist otherwise the app will blow up
-make generate-version-file
+# Install Python dependencies and run any pending migrations
+scripts/update_dependencies_and_migrate_db.sh
 
-# Install Python development dependencies
-pip3 install -r requirements_for_test.txt
-
-# Create Postgres databases
-if [[ -z "${NOTIFICATION_API_DB_HOST}" ]] || [[ -z "${NOTIFICATION_API_DB_PORT}" ]] || [[ -z "${NOTIFICATION_API_DB_USER}" ]]; then
-  createdb notification_api
-else
-  createdb -h $NOTIFICATION_API_DB_HOST -p $NOTIFICATION_API_DB_PORT -U $NOTIFICATION_API_DB_USER notification_api
-fi
-
-# Upgrade databases
-source environment.sh
-flask db upgrade
+# Update seeded DB records with sensible default for local development
+source environment.sh && python scripts/update_database_records_for_local_development.py
