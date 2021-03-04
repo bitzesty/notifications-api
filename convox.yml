@@ -9,6 +9,7 @@ environment:
   - AWS_SECRET_ACCESS_KEY
   - SQLALCHEMY_DATABASE_URI
   - SENTRY_DSN
+  - NOTIFY_LOG_PATH
 services:
   api:
     build:
@@ -16,3 +17,10 @@ services:
       manifest: docker/Dockerfile.convox
     command: 'gunicorn -c gunicorn_config.py application'
     port: 8080
+
+  worker:
+    build:
+      path: .
+      manifest: docker/Dockerfile.convox
+    command: 'celery -A run_celery.notify_celery worker'
+    internal: true
