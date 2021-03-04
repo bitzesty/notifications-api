@@ -13,6 +13,6 @@ sentry_sdk.init(
 )
 
 
-application = Flask('delivery')
+application = Flask('celery')
 create_app(application)
 application.app_context().push()
