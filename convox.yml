@@ -27,7 +27,7 @@ services:
     internal: true
     scale:
       memory: 2048
-  celery_beat:
+  celery-beat:
     build:
       path: .
       manifest: docker/Dockerfile.convox
