@@ -17,10 +17,19 @@ services:
       manifest: docker/Dockerfile.convox
     command: 'gunicorn -c gunicorn_config.py application'
     port: 8080
-
-  worker:
+    scale:
+      memory: 1024
+  celery:
     build:
       path: .
       manifest: docker/Dockerfile.convox
-    command: 'celery -A run_celery.notify_celery worker'
+    command: 'celery -A run_celery.notify_celery worker --loglevel=INFO --concurrency=4'
+    internal: true
+    scale:
+      memory: 2048
+  celery_beat:
+    build:
+      path: .
+      manifest: docker/Dockerfile.convox
+    command: 'celery -A run_celery.notify_celery beat --loglevel=INFO'
     internal: true
