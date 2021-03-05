@@ -17,6 +17,7 @@ services:
       manifest: docker/Dockerfile.convox
     command: 'gunicorn -c gunicorn_config.py application'
     port: 8080
+    domain: ${DOMAIN}
     scale:
       memory: 1024
   celery:
