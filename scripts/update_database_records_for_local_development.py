@@ -36,6 +36,9 @@ if user and service:
         db.session.add(permission)
         db.session.commit()
 
+    user.platform_admin = True
+    db.session.commit()
+
 
 # SMS Backend Providers: Disable MMG and enable Firetext
 # It's easier to open a Firetext account so this seems like a better default.
