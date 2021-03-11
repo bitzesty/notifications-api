@@ -25,6 +25,3 @@ fi
 
 # Install Python dependencies and run any pending migrations
 scripts/update_dependencies_and_migrate_db.sh
-
-# Update seeded DB records with sensible default for local development
-source environment.sh && python scripts/update_database_records_for_local_development.py
