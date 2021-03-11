@@ -10,9 +10,6 @@ def test_get_status_all_ok(client, notify_db_session, path):
     assert response.status_code == 200
     resp_json = json.loads(response.get_data(as_text=True))
     assert resp_json['status'] == 'ok'
-    assert resp_json['db_version']
-    assert resp_json['git_commit']
-    assert resp_json['build_time']
 
 
 def test_empty_live_service_and_organisation_counts(admin_request):

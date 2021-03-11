@@ -28,6 +28,7 @@ lxml==4.6.2
 # higher version causes build to fail
 cryptography<3.4
 twilio
+sentry-sdk[flask]
 
 notifications-python-client==5.7.1
 

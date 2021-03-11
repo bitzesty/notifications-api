@@ -1,0 +1,36 @@
+environment:
+  - ADMIN_BASE_URL
+  - API_HOST_NAME
+  - NOTIFY_ENVIRONMENT
+  - DOMAIN
+  - AWS_DEFAULT_REGION
+  - AWS_REGION
+  - AWS_ACCESS_KEY_ID
+  - AWS_SECRET_ACCESS_KEY
+  - SQLALCHEMY_DATABASE_URI
+  - SENTRY_DSN
+  - NOTIFY_LOG_PATH
+services:
+  api:
+    build:
+      path: .
+      manifest: docker/Dockerfile.convox
+    command: 'gunicorn -c gunicorn_config.py application'
+    port: 8080
+    domain: ${DOMAIN}
+    scale:
+      memory: 1024
+  celery:
+    build:
+      path: .
+      manifest: docker/Dockerfile.convox
+    command: 'celery -A run_celery.notify_celery worker --loglevel=INFO --concurrency=4'
+    internal: true
+    scale:
+      memory: 1024
+  celery-beat:
+    build:
+      path: .
+      manifest: docker/Dockerfile.convox
+    command: 'celery -A run_celery.notify_celery beat --loglevel=INFO'
+    internal: true
