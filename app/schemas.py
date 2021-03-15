@@ -701,6 +701,7 @@ class NotificationsFilterSchema(ma.Schema):
 class ServiceHistorySchema(ma.Schema):
     id = fields.UUID()
     name = fields.String()
+    description = fields.String()
     created_at = fields.DateTime()
     updated_at = fields.DateTime()
     active = fields.Boolean()
