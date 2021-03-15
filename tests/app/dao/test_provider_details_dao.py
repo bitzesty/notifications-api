@@ -44,7 +44,7 @@ def set_primary_sms_provider(identifier):
 
 def test_can_get_sms_non_international_providers(notify_db_session):
     sms_providers = get_provider_details_by_notification_type('sms')
-    assert len(sms_providers) == 2
+    assert len(sms_providers) == 3
     assert all('sms' == prov.notification_type for prov in sms_providers)
 
 
