@@ -418,7 +418,7 @@ class Development(Config):
     NOTIFY_ENVIRONMENT = 'development'
     NOTIFY_LOG_PATH = 'application.log'
     NOTIFICATION_QUEUE_PREFIX = 'development'
-    NOTIFY_EMAIL_DOMAIN = "notify.tools"
+    NOTIFY_EMAIL_DOMAIN = get_env_var('NOTIFY_EMAIL_DOMAIN', 'notify.tools')
 
     SQLALCHEMY_DATABASE_URI = get_env_var('SQLALCHEMY_DATABASE_URI', 'postgresql://localhost/notification_api')
     REDIS_URL = get_env_var('REDIS_URL', 'redis://localhost:6379/0')
@@ -430,7 +430,7 @@ class Development(Config):
             Queue(queue, Exchange('default'), routing_key=queue)
         )
 
-    API_HOST_NAME = "http://localhost:6011"
+    API_HOST_NAME = get_env_var('API_HOST_NAME', "http://localhost:6011")
     API_RATE_LIMIT_ENABLED = True
 
 
