@@ -101,7 +101,7 @@ from app.errors import (
 )
 from app.letters.utils import letter_print_day
 from app.models import (
-    KEY_TYPE_NORMAL, LETTER_TYPE, NOTIFICATION_CANCELLED, Permission, Service,
+    KEY_TYPE_NORMAL, LETTER_TYPE, EMAIL_TYPE, NOTIFICATION_CANCELLED, Permission, Service,
     EmailBranding, LetterBranding,
     ServiceContactList
 )
@@ -249,6 +249,7 @@ def update_service(service_id):
     fetched_service = dao_fetch_service_by_id(service_id)
     # Capture the status change here as Marshmallow changes this later
     service_going_live = fetched_service.restricted and not req_json.get('restricted', True)
+    service_go_live_requested = fetched_service.go_live_user != req_json.get('go_live_user', None)
     current_data = dict(service_schema.dump(fetched_service).data.items())
     current_data.update(request.get_json())
 
@@ -261,6 +262,27 @@ def update_service(service_id):
         letter_branding_id = req_json['letter_branding']
         service.letter_branding = None if not letter_branding_id else LetterBranding.query.get(letter_branding_id)
     dao_update_service(service)
+
+    if service_go_live_requested:
+        template = dao_get_template_by_id(current_app.config['NOTIFY_ADMIN'])
+        service_url = "{}/services/{}".format(current_app.config['ADMIN_BASE_URL'],str(service.id))
+        saved_notification = persist_notification(
+        template_id=template.id,
+        template_version=template.version,
+        recipient=get_or_build_support_email_address(),
+        service=template.service,
+        personalisation={
+            'service_name': service.name,
+            'service_dashboard_url': service_url
+        },
+        notification_type=EMAIL_TYPE,
+        api_key_id=None,
+        key_type=KEY_TYPE_NORMAL,
+        reply_to_text=get_or_build_support_email_address()
+    )
+
+    send_notification_to_queue(saved_notification, research_mode=False, queue=QueueNames.NOTIFY)
+
 
     if service_going_live:
         send_notification_to_service_users(
