@@ -267,21 +267,20 @@ def update_service(service_id):
         template = dao_get_template_by_id(current_app.config['NOTIFY_ADMIN'])
         service_url = "{}/services/{}".format(current_app.config['ADMIN_BASE_URL'],str(service.id))
         saved_notification = persist_notification(
-        template_id=template.id,
-        template_version=template.version,
-        recipient=get_or_build_support_email_address(),
-        service=template.service,
-        personalisation={
-            'service_name': service.name,
-            'service_dashboard_url': service_url
-        },
-        notification_type=EMAIL_TYPE,
-        api_key_id=None,
-        key_type=KEY_TYPE_NORMAL,
-        reply_to_text=get_or_build_support_email_address()
-    )
-
-    send_notification_to_queue(saved_notification, research_mode=False, queue=QueueNames.NOTIFY)
+            template_id=template.id,
+            template_version=template.version,
+            recipient=get_or_build_support_email_address(),
+            service=template.service,
+            personalisation={
+                'service_name': service.name,
+                'service_dashboard_url': service_url
+            },
+            notification_type=EMAIL_TYPE,
+            api_key_id=None,
+            key_type=KEY_TYPE_NORMAL,
+            reply_to_text=get_or_build_support_email_address()
+        )
+        send_notification_to_queue(saved_notification, research_mode=False, queue=QueueNames.NOTIFY)
 
 
     if service_going_live:
