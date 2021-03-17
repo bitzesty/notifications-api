@@ -131,7 +131,13 @@ from app.schemas import (
     email_data_request_schema
 )
 from app.user.users_schema import post_set_permissions_schema
-from app.utils import DATE_FORMAT, DATETIME_FORMAT_NO_TIMEZONE, midnight_n_days_ago, pagination_links
+from app.utils import (
+    DATE_FORMAT,
+    DATETIME_FORMAT_NO_TIMEZONE,
+    midnight_n_days_ago,
+    pagination_links,
+    get_or_build_support_email_address
+)
 
 service_blueprint = Blueprint('service', __name__)
 
