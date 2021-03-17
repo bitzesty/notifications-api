@@ -264,7 +264,7 @@ def update_service(service_id):
     dao_update_service(service)
 
     if service_go_live_requested:
-        template = dao_get_template_by_id(current_app.config['NOTIFY_ADMIN'])
+        template = dao_get_template_by_id(current_app.config['NOTIFY_ADMIN_OF_GO_LIVE_REQUEST_TEMPLATE_ID'])
         service_url = "{}/services/{}".format(current_app.config['ADMIN_BASE_URL'],str(service.id))
         saved_notification = persist_notification(
             template_id=template.id,
