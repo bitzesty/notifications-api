@@ -44,7 +44,7 @@ def upgrade():
         "Catalyst Notify Team",
     ])
 
-    email_template_name = "Notify admins fo new go-live request"
+    email_template_name = "Notify admins of new go-live request"
     email_template_subject = 'A service has requested to go-live'
 
     op.execute(
