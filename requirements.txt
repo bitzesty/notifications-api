@@ -74,7 +74,7 @@ Mako==1.1.4
 MarkupSafe==1.1.1
 mistune==0.8.4
 monotonic==1.5
-git+git://github.com/bitzesty/notifications-utils@43.9.2
+git+git://github.com/bitzesty/notifications-utils@43.9.3
 orderedset==2.0.3
 packaging==20.9
 phonenumbers==8.12.19
