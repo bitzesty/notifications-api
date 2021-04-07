@@ -1,18 +1,19 @@
 """
 
-Revision ID: 1dc64fef5092
-Revises: e12edee68895
-Create Date: 2021-03-16 12:51:15.736512
+Revision ID: 07ed5bddc724
+Revises: 1dc64fef5092
+Create Date: 2021-04-05 22:38:09.532413
 
 """
 from datetime import datetime
 from alembic import op
 from flask import current_app
 
-revision = '1dc64fef5092'
-down_revision = 'e12edee68895'
 
-email_template_id = '63ec0cba-6178-4bdf-b44c-fbab042e4f4e'
+revision = '07ed5bddc724'
+down_revision = '1dc64fef5092'
+
+email_template_id = '82456472-ca40-4dda-9328-d08af07fade5'
 
 
 def upgrade():
@@ -26,23 +27,25 @@ def upgrade():
         created_by_id, version, process_type, hidden)
         VALUES ('{}', '{}', '{}', '{}', '{}', False, '{}', '{}', '{}', 1, '{}', false)
     """
-
     email_template_content = '\n'.join([
         "Hi,",
         "",
-        "A Catalyst Notify service, ((service_name)), has requested to go live.",
+        "There is new support request.",
         "",
-        "Please review their request as soon as possible by following the link below:",
-        "",
-        "((service_dashboard_url))",
+        "Message:",
+        "((message))",
+        "Name:",
+        "((name))",
+        "Email:",
+        "((email))",
         "",
         "Thanks,",
         "",
         "Catalyst Notify Team",
     ])
 
-    email_template_name = "Notify admins of new go-live request"
-    email_template_subject = 'A service has requested to go-live'
+    email_template_name = "Notify admins about new support request"
+    email_template_subject = 'New support request'
 
     op.execute(
         template_history_insert.format(
