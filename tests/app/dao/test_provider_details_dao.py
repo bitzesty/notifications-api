@@ -316,33 +316,43 @@ def test_dao_get_provider_stats(notify_db_session):
 
     create_ft_billing('2017-06-05', sms_template_2, provider='firetext', billable_unit=4)
     create_ft_billing('2018-05-31', sms_template_1, provider='mmg', billable_unit=1)
-    create_ft_billing('2018-06-01', sms_template_1, provider='mmg',
-                      rate_multiplier=2, billable_unit=1)
+    create_ft_billing('2018-06-01', sms_template_1, provider='mmg', rate_multiplier=2, billable_unit=1)
     create_ft_billing('2018-06-03', sms_template_2, provider='firetext', billable_unit=4)
     create_ft_billing('2018-06-15', sms_template_1, provider='firetext', billable_unit=1)
     create_ft_billing('2018-06-28', sms_template_2, provider='mmg', billable_unit=2)
 
     result = dao_get_provider_stats()
 
-    assert len(result) == 4
+    assert len(result) == 5
 
     assert result[0].identifier == 'ses'
     assert result[0].display_name == 'AWS SES'
     assert result[0].created_by_name is None
+    assert result[0].active is True
+    assert result[0].supports_international is False
     assert result[0].current_month_billable_sms == 0
 
     assert result[1].identifier == 'firetext'
     assert result[1].notification_type == 'sms'
     assert result[1].supports_international is False
-    assert result[1].active is True
+    assert result[1].active is False
     assert result[1].current_month_billable_sms == 5
 
-    assert result[2].identifier == 'mmg'
-    assert result[2].display_name == 'MMG'
-    assert result[2].supports_international is True
+    assert result[2].identifier == 'twilio'
+    assert result[2].display_name == 'Twilio'
+    assert result[2].notification_type == 'sms'
+    assert result[2].supports_international is False
     assert result[2].active is True
-    assert result[2].current_month_billable_sms == 4
+    assert result[2].current_month_billable_sms == 0
 
-    assert result[3].identifier == 'dvla'
-    assert result[3].current_month_billable_sms == 0
-    assert result[3].supports_international is False
+    assert result[3].identifier == 'mmg'
+    assert result[3].display_name == 'MMG'
+    assert result[3].supports_international is True
+    assert result[3].active is False
+    assert result[3].current_month_billable_sms == 4
+
+    assert result[4].identifier == 'dvla'
+    assert result[4].display_name == 'DVLA'
+    assert result[4].current_month_billable_sms == 0
+    assert result[4].supports_international is False
+    assert result[4].active is True
