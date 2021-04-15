@@ -233,7 +233,8 @@ def test_post_create_organisation_existing_name_raises_400(admin_request, sample
         'organisation_type': 'foo',
     }, (
         'organisation_type foo is not one of '
-        '[central, local, nhs_central, nhs_local, nhs_gp, emergency_service, school_or_college, charity, community_interest, other]'
+        '[central, local, nhs_central, nhs_local, nhs_gp, emergency_service, school_or_college, charity, '
+        'community_interest, other] '
     )),
 ))
 def test_post_create_organisation_with_missing_data_gives_validation_error(

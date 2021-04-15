@@ -41,16 +41,16 @@ def setup_function(_function):
 
 
 def test_provider_to_use_should_return_random_provider(mocker, notify_db_session):
-    mmg = get_provider_details_by_identifier('mmg')
+    twilio = get_provider_details_by_identifier('twilio')
     firetext = get_provider_details_by_identifier('firetext')
-    mmg.priority = 25
+    twilio.priority = 25
     firetext.priority = 75
-    mock_choices = mocker.patch('app.delivery.send_to_providers.random.choices', return_value=[mmg])
+    mock_choices = mocker.patch('app.delivery.send_to_providers.random.choices', return_value=[twilio])
 
     ret = send_to_providers.provider_to_use('sms', international=False)
 
-    mock_choices.assert_called_once_with([mmg, firetext], weights=[25, 75])
-    assert ret.get_name() == 'mmg'
+    mock_choices.assert_called_once_with([twilio, firetext], weights=[25, 75])
+    assert ret.get_name() == 'twilio'
 
 
 def test_provider_to_use_should_cache_repeated_calls(mocker, notify_db_session):
