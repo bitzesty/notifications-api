@@ -2,7 +2,7 @@ from datetime import timedelta, datetime, date, time
 from uuid import UUID
 
 import pytest
-import mock
+from unittest import mock
 
 from app.dao.fact_notification_status_dao import (
     update_fact_notification_status,
