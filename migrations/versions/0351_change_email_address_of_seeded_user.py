@@ -18,5 +18,6 @@ def upgrade():
     email_address = "support@" + os.environ.get("NOTIFY_EMAIL_DOMAIN", "example.com")
     op.execute("update users set email_address = '{}' where id = '6af522d0-2915-4e52-83a3-3690455a5fe6'".format(email_address))
 
+
 def downgrade():
     op.execute("update users set email_address = 'notify-service-user@digital.cabinet-office.gov.uk' where id = '6af522d0-2915-4e52-83a3-3690455a5fe6'")

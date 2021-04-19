@@ -14,9 +14,10 @@ down_revision = '428551b7cf6f'
 
 
 def upgrade():
-  op.execute("update users set mobile_number = '+447123456789' where id = '6af522d0-2915-4e52-83a3-3690455a5fe6'")
-  op.execute("update users set auth_type = 'email_auth' where id = '6af522d0-2915-4e52-83a3-3690455a5fe6'")
+    op.execute("update users set mobile_number = '+447123456789' where id = '6af522d0-2915-4e52-83a3-3690455a5fe6'")
+    op.execute("update users set auth_type = 'email_auth' where id = '6af522d0-2915-4e52-83a3-3690455a5fe6'")
+
 
 def downgrade():
-  op.execute("update users set mobile_number = '+441234123412' where id = '6af522d0-2915-4e52-83a3-3690455a5fe6'")
-  op.execute("update users set auth_type = 'sms_auth' where id = '6af522d0-2915-4e52-83a3-3690455a5fe6'")
+    op.execute("update users set mobile_number = '+441234123412' where id = '6af522d0-2915-4e52-83a3-3690455a5fe6'")
+    op.execute("update users set auth_type = 'sms_auth' where id = '6af522d0-2915-4e52-83a3-3690455a5fe6'")

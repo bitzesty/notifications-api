@@ -20,6 +20,7 @@ def upgrade():
     op.execute("update provider_details set active = False where identifier = 'firetext'")
     op.execute("INSERT INTO provider_details (id, display_name, identifier, priority, notification_type, version, active) values ('{}', 'Twilio', 'twilio', 10, 'sms', 1, true)".format(str(uuid.uuid4())))
 
+
 def downgrade():
     op.get_bind()
     op.execute("update provider_details set active = True where identifier = 'mmg'")

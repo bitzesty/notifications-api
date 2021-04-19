@@ -17,6 +17,7 @@ def upgrade():
     op.get_bind()
     op.execute("update provider_details set active = True where identifier = 'firetext'")
 
+
 def downgrade():
     op.get_bind()
     op.execute("update provider_details set active = False where identifier = 'firetext'")
