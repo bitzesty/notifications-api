@@ -15,6 +15,7 @@ from app.dao.invited_user_dao import save_invited_user
 from app.dao.jobs_dao import dao_create_job
 from app.dao.notifications_dao import dao_create_notification
 from app.dao.organisation_dao import dao_create_organisation
+from app.dao.provider_details_dao import get_provider_details_by_identifier
 from app.dao.services_dao import (dao_create_service, dao_add_user_to_service)
 from app.dao.templates_dao import dao_create_template
 from app.dao.users_dao import create_secret_code, create_user_code
@@ -570,12 +571,22 @@ def fake_uuid():
 
 @pytest.fixture(scope='function')
 def ses_provider():
-    return ProviderDetails.query.filter_by(identifier='ses').one()
+    return get_provider_details_by_identifier('ses')
 
 
 @pytest.fixture(scope='function')
 def mmg_provider():
-    return ProviderDetails.query.filter_by(identifier='mmg').one()
+    return get_provider_details_by_identifier('mmg')
+
+
+@pytest.fixture(scope='function')
+def twilio_provider():
+    return get_provider_details_by_identifier('twilio')
+
+
+@pytest.fixture(scope='function')
+def firetext_provider():
+    return get_provider_details_by_identifier('firetext')
 
 
 @pytest.fixture(scope='function')

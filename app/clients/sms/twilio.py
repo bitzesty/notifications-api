@@ -40,9 +40,9 @@ class TwilioClientResponseException(SmsClientResponseException):
 
 
 class TwilioClient(SmsClient):
-    '''
+    """
     Twilio SMS client.
-    '''
+    """
 
     def init_app(self, current_app, statsd_client, *args, **kwargs):
         super(SmsClient, self).__init__(*args, **kwargs)
@@ -75,9 +75,10 @@ class TwilioClient(SmsClient):
         self.current_app.logger.info(log_message)
 
     def send_sms(self, to, content, reference=None, sender=None):
+        client = Client(self.twilio_sid, self.twilio_auth_token)
+        start_time = monotonic()
+
         try:
-            start_time = monotonic()
-            client = Client(self.twilio_sid, self.twilio_auth_token)
             client.messages.create(
                 to=TwilioUtils.format_number_for_twilio(to),
                 from_=self.from_number if sender is None else sender,
