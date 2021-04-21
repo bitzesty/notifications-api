@@ -166,6 +166,7 @@ def get_string_or_default(val, default=None):
 def get_env_var(name, default=None):
     return get_string_or_default(os.environ.get(name), default)
 
+
 def get_or_build_support_email_address():
     fallback_email = "support@" + os.environ.get("NOTIFY_EMAIL_DOMAIN", "example.com")
     return get_env_var('SUPPORT_EMAIL_ADDRESS', fallback_email)

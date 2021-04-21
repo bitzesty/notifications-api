@@ -50,7 +50,7 @@ def test_can_get_sms_non_international_providers(notify_db_session):
 
 def test_can_get_sms_international_providers(notify_db_session):
     sms_providers = get_provider_details_by_notification_type('sms', True)
-    assert len(sms_providers) == 1
+    assert len(sms_providers) == 2
     assert all('sms' == prov.notification_type for prov in sms_providers)
     assert all(prov.supports_international for prov in sms_providers)
 
@@ -179,12 +179,12 @@ def test_adjust_provider_priority_adds_history(
 @freeze_time('2016-01-01 01:00')
 def test_get_sms_providers_for_update_returns_providers(restore_provider_details):
     sixty_one_minutes_ago = datetime(2015, 12, 31, 23, 59)
-    ProviderDetails.query.filter(ProviderDetails.identifier == 'mmg').update({'updated_at': sixty_one_minutes_ago})
+    ProviderDetails.query.filter(ProviderDetails.identifier == 'twilio').update({'updated_at': sixty_one_minutes_ago})
     ProviderDetails.query.filter(ProviderDetails.identifier == 'firetext').update({'updated_at': None})
 
     resp = _get_sms_providers_for_update(timedelta(hours=1))
 
-    assert {p.identifier for p in resp} == {'mmg', 'firetext'}
+    assert {p.identifier for p in resp} == {'twilio', 'firetext'}
 
 
 @freeze_time('2016-01-01 01:00')
@@ -198,17 +198,17 @@ def test_get_sms_providers_for_update_returns_nothing_if_recent_updates(restore_
 
 
 @pytest.mark.parametrize(['starting_priorities', 'expected_priorities'], [
-    ({'mmg': 50, 'firetext': 50}, {'mmg': 40, 'firetext': 60}),
-    ({'mmg': 0, 'firetext': 20}, {'mmg': 0, 'firetext': 30}),  # lower bound respected
-    ({'mmg': 50, 'firetext': 100}, {'mmg': 40, 'firetext': 100}),  # upper bound respected
+    ({'twilio': 50, 'firetext': 50}, {'twilio': 40, 'firetext': 60}),
+    ({'twilio': 0, 'firetext': 20}, {'twilio': 0, 'firetext': 30}),  # lower bound respected
+    ({'twilio': 50, 'firetext': 100}, {'twilio': 40, 'firetext': 100}),  # upper bound respected
 
     # document what happens if they have unexpected values outside of the 0 - 100 range (due to manual setting from
     # the admin app). the code never causes further issues, but sometimes doesn't actively reset the vaues to 0-100.
-    ({'mmg': 150, 'firetext': 50}, {'mmg': 140, 'firetext': 60}),
-    ({'mmg': 50, 'firetext': 150}, {'mmg': 40, 'firetext': 100}),
+    ({'twilio': 150, 'firetext': 50}, {'twilio': 140, 'firetext': 60}),
+    ({'twilio': 50, 'firetext': 150}, {'twilio': 40, 'firetext': 100}),
 
-    ({'mmg': -100, 'firetext': 50}, {'mmg': 0, 'firetext': 60}),
-    ({'mmg': 50, 'firetext': -100}, {'mmg': 40, 'firetext': -90}),
+    ({'twilio': -100, 'firetext': 50}, {'twilio': 0, 'firetext': 60}),
+    ({'twilio': 50, 'firetext': -100}, {'twilio': 40, 'firetext': -90}),
 ])
 def test_reduce_sms_provider_priority_adjusts_provider_priorities(
     mocker,
@@ -219,19 +219,19 @@ def test_reduce_sms_provider_priority_adjusts_provider_priorities(
 ):
     mock_adjust = mocker.patch('app.dao.provider_details_dao._adjust_provider_priority')
 
-    mmg = get_provider_details_by_identifier('mmg')
+    twilio = get_provider_details_by_identifier('twilio')
     firetext = get_provider_details_by_identifier('firetext')
 
-    mmg.priority = starting_priorities['mmg']
+    twilio.priority = starting_priorities['twilio']
     firetext.priority = starting_priorities['firetext']
     # need to update these manually to avoid triggering the `onupdate` clause of the updated_at column
     ProviderDetails.query.filter(ProviderDetails.notification_type == 'sms').update({'updated_at': datetime.min})
 
     # switch away from mmg. currently both 50/50
-    dao_reduce_sms_provider_priority('mmg', time_threshold=timedelta(minutes=10))
+    dao_reduce_sms_provider_priority('twilio', time_threshold=timedelta(minutes=10))
 
     mock_adjust.assert_any_call(firetext, expected_priorities['firetext'])
-    mock_adjust.assert_any_call(mmg, expected_priorities['mmg'])
+    mock_adjust.assert_any_call(twilio, expected_priorities['twilio'])
 
 
 def test_reduce_sms_provider_priority_does_nothing_if_providers_have_recently_changed(
@@ -316,19 +316,20 @@ def test_dao_get_provider_stats(notify_db_session):
 
     create_ft_billing('2017-06-05', sms_template_2, provider='firetext', billable_unit=4)
     create_ft_billing('2018-05-31', sms_template_1, provider='mmg', billable_unit=1)
-    create_ft_billing('2018-06-01', sms_template_1, provider='mmg',
-                      rate_multiplier=2, billable_unit=1)
+    create_ft_billing('2018-06-01', sms_template_1, provider='mmg', rate_multiplier=2, billable_unit=1)
     create_ft_billing('2018-06-03', sms_template_2, provider='firetext', billable_unit=4)
     create_ft_billing('2018-06-15', sms_template_1, provider='firetext', billable_unit=1)
     create_ft_billing('2018-06-28', sms_template_2, provider='mmg', billable_unit=2)
 
     result = dao_get_provider_stats()
 
-    assert len(result) == 4
+    assert len(result) == 5
 
     assert result[0].identifier == 'ses'
     assert result[0].display_name == 'AWS SES'
     assert result[0].created_by_name is None
+    assert result[0].active is True
+    assert result[0].supports_international is False
     assert result[0].current_month_billable_sms == 0
 
     assert result[1].identifier == 'firetext'
@@ -337,12 +338,21 @@ def test_dao_get_provider_stats(notify_db_session):
     assert result[1].active is True
     assert result[1].current_month_billable_sms == 5
 
-    assert result[2].identifier == 'mmg'
-    assert result[2].display_name == 'MMG'
+    assert result[2].identifier == 'twilio'
+    assert result[2].display_name == 'Twilio'
+    assert result[2].notification_type == 'sms'
     assert result[2].supports_international is True
     assert result[2].active is True
-    assert result[2].current_month_billable_sms == 4
+    assert result[2].current_month_billable_sms == 0
 
-    assert result[3].identifier == 'dvla'
-    assert result[3].current_month_billable_sms == 0
-    assert result[3].supports_international is False
+    assert result[3].identifier == 'mmg'
+    assert result[3].display_name == 'MMG'
+    assert result[3].supports_international is True
+    assert result[3].active is False
+    assert result[3].current_month_billable_sms == 4
+
+    assert result[4].identifier == 'dvla'
+    assert result[4].display_name == 'DVLA'
+    assert result[4].current_month_billable_sms == 0
+    assert result[4].supports_international is False
+    assert result[4].active is True

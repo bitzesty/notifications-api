@@ -9,6 +9,10 @@ from app.models import FactBilling, ProviderDetails, ProviderDetailsHistory, SMS
 from app import db
 
 
+def get_all_active_providers():
+    return ProviderDetails.query.filter_by(active=True).all()
+
+
 def get_provider_details_by_id(provider_details_id):
     return ProviderDetails.query.get(provider_details_id)
 

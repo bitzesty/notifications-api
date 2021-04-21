@@ -12,9 +12,11 @@ from sqlalchemy.dialects import postgresql
 revision = '93fdd95e5ed3'
 down_revision = '0345_move_broadcast_provider'
 
+
 def upgrade():
     op.get_bind()
     op.execute("update services set email_from = 'noreply' where id = 'd6aa2c68-a2d9-4437-ab19-3ae8eb202553'")
+
 
 def downgrade():
     op.get_bind()

@@ -254,6 +254,7 @@ def test_get_service_by_id(admin_request, sample_service):
         'contact_link',
         'count_as_live',
         'created_by',
+        'description',
         'email_branding',
         'email_from',
         'go_live_at',

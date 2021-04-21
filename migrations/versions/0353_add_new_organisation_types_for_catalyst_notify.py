@@ -18,6 +18,7 @@ def upgrade():
     op.execute("INSERT INTO organisation_types (name, annual_free_sms_fragment_limit, is_crown) values ('charity', 25000, 'False')")
     op.execute("INSERT INTO organisation_types (name, annual_free_sms_fragment_limit, is_crown) values ('community_interest', 25000, 'False')")
 
+
 def downgrade():
     op.get_bind()
     op.execute("DELETE from organisation_types where name = 'charity'")

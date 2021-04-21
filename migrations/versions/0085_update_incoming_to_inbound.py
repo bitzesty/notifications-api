@@ -14,6 +14,7 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
+
 def upgrade():
     op.execute("UPDATE service_permission_types SET name='inbound_sms' WHERE name='incoming_sms'")
 

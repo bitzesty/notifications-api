@@ -55,6 +55,7 @@ def upgrade():
         )
     ])
 
+
 def downgrade():
     # Make sure you've thought about billing implications etc before downgrading!
     conn = op.get_bind()
