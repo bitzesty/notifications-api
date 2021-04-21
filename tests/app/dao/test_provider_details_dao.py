@@ -50,7 +50,7 @@ def test_can_get_sms_non_international_providers(notify_db_session):
 
 def test_can_get_sms_international_providers(notify_db_session):
     sms_providers = get_provider_details_by_notification_type('sms', True)
-    assert len(sms_providers) == 1
+    assert len(sms_providers) == 2
     assert all('sms' == prov.notification_type for prov in sms_providers)
     assert all(prov.supports_international for prov in sms_providers)
 
@@ -341,7 +341,7 @@ def test_dao_get_provider_stats(notify_db_session):
     assert result[2].identifier == 'twilio'
     assert result[2].display_name == 'Twilio'
     assert result[2].notification_type == 'sms'
-    assert result[2].supports_international is False
+    assert result[2].supports_international is True
     assert result[2].active is True
     assert result[2].current_month_billable_sms == 0
 

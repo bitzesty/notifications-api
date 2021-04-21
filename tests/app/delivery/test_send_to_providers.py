@@ -10,7 +10,7 @@ from notifications_utils.recipients import validate_and_format_phone_number
 from requests import HTTPError
 
 import app
-from app import notification_provider_clients, mmg_client, firetext_client, twilio_client
+from app import notification_provider_clients, firetext_client, twilio_client
 from app.dao import notifications_dao
 from app.dao.provider_details_dao import get_all_active_providers
 from app.delivery import send_to_providers
@@ -77,7 +77,7 @@ def test_provider_to_use_should_only_return_twilio_for_international(mocker, not
 
     ret = send_to_providers.provider_to_use('sms', international=True)
 
-    mock_choices.assert_called_once_with([twilio_provider], weights=[0])
+    mock_choices.assert_called_once_with([twilio_provider], weights=[10])
     assert ret.get_name() == 'twilio'
 
 
@@ -92,7 +92,7 @@ def test_provider_to_use_should_only_return_active_providers(
 
     ret = send_to_providers.provider_to_use('sms')
 
-    mock_choices.assert_called_once_with([twilio_provider], weights=[0])
+    mock_choices.assert_called_once_with([twilio_provider], weights=[10])
     assert ret.get_name() == 'twilio'
 
 
@@ -595,8 +595,10 @@ def test_should_update_billable_units_and_status_according_to_research_mode_and_
     research_mode,
     key_type,
     billable_units,
-    expected_status
+    expected_status,
+    twilio_provider
 ):
+    twilio_provider.priority = 10
     notification = create_notification(template=sample_template, billable_units=0, status='created', key_type=key_type)
     res = Mock(content=json.dumps({'sid': 1}))
     mocker.patch('app.twilio_client.send_sms', return_value=res)
@@ -643,7 +645,7 @@ def test_should_send_sms_to_international_providers(
 
     # set firetext to active
     firetext_provider.priority = 100
-    twilio_provider.priority = 0
+    twilio_provider.priority = 10
 
     notification_uk = create_notification(
         template=sample_template,
@@ -705,8 +707,10 @@ def test_should_handle_sms_sender_and_prefix_message(
     prefix_sms,
     expected_sender,
     expected_content,
-    notify_db_session
+    notify_db_session,
+    twilio_provider
 ):
+    twilio_provider.priority = 10
     res = Mock(content=json.dumps({'sid': 1}))
     mocker.patch('app.twilio_client.send_sms', return_value=res)
     service = create_service_with_defined_sms_sender(sms_sender_value=sms_sender, prefix_sms=prefix_sms)
