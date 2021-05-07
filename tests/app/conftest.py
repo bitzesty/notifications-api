@@ -625,10 +625,10 @@ def email_2fa_code_template(notify_db, notify_db_session):
         content=(
             'Hi ((name)),'
             ''
-            'To sign in to GOV.​UK Notify please open this link:'
+            'To sign in to Catalyst Notify please open this link:'
             '((url))'
         ),
-        subject='Sign in to GOV.UK Notify',
+        subject='Sign in to Catalyst Notify',
         template_type='email'
     )
 
@@ -712,7 +712,7 @@ def verify_reply_to_address_email_template(notify_db, notify_db_session):
         user=user,
         template_config_name='REPLY_TO_EMAIL_ADDRESS_VERIFICATION_TEMPLATE_ID',
         content="Hi,This address has been provided as the reply-to email address so we are verifying if it's working",
-        subject='Your GOV.UK Notify reply-to email address',
+        subject='Your Catalyst Notify reply-to email address',
         template_type='email'
     )
 
@@ -726,7 +726,7 @@ def team_member_email_edit_template(notify_db, notify_db_session):
         user=user,
         template_config_name='TEAM_MEMBER_EDIT_EMAIL_TEMPLATE_ID',
         content='Hi ((name)) ((servicemanagername)) changed your email to ((email address))',
-        subject='Your GOV.UK Notify email address has changed',
+        subject='Your Catalyst Notify email address has changed',
         template_type='email'
     )
 
@@ -766,7 +766,7 @@ def change_email_confirmation_template(notify_db,
     content = """Hi ((name)),
               Click this link to confirm your new email address:
               ((url))
-              If you didn’t try to change the email address for your GOV.UK Notify account, let us know here:
+              If you didn’t try to change the email address for your Catalyst account, let us know here:
               ((feedback_url))"""
     template = create_custom_template(
         service=service,
